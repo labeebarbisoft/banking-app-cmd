@@ -18,98 +18,131 @@ def is_valid_amount(amount):
     except:
         return False
 
-def create_account():
-    name, email, password = "", "", ""
-    while True:
-        name = input("Enter your name: ")
-        if not is_valid_name(name):
-            print("Invalid name format. Please try again.")
-        else:
-            break
-        
-    while True:
-        email = input("Enter your email: ")
-        if not is_valid_email(email):
-            print("Invalid email format. Please try again.")
-        elif check_duplicate_email(email):
-            print("An account with this email already exists. Please use a different email.")
-        else:
-            break
+class account():
+    def __init__(self, name = "", email = "", password = "", balance = "0"):
+        self._name = name
+        self._email = email
+        self._password = password
+        self._balance = balance
 
-    while True:
-        password = input("Create a password: ")
-        if not is_valid_password(password):
-            print("Invalid password format. Please try again.")
-        else:
-            break
-    
-    balance = 0
-
-    with open("bank_accounts.csv", "a", newline="") as file:
-        writer = csv.writer(file)
-        writer.writerow([name, email, password, balance])
-        print("Account successfully created")
-
-def check_duplicate_email(email):
-    with open("bank_accounts.csv", "r") as file:
-        reader = csv.reader(file)
-        for row in reader:
-            if row[1] == email:
-                return True
-    return False
-
-def login():
-    email = input("Enter your email: ")
-    password = input("Enter your password: ")
-
-    with open("bank_accounts.csv", "r") as file:
-        reader = csv.reader(file)
-        for row in reader:
-            if row[1] == email and row[2] == password:
-                return row
-    return None
-
-def deposit(account):
-    while True:
-        amount = input("Enter the amount to deposit: ")
-        if not is_valid_amount(amount):
-            print("Invalid amount. Amount must be a number greater than 0.")
-        else:
-            account[3] = str(int(account[3]) + int(amount))
-            update_account(account)
-            print("Deposit successful.")
-            break
-
-def withdraw(account):
-    while True:
-        amount = input("Enter the amount to withdraw: ")
-        if not is_valid_amount(amount):
-            print("Invalid amount. Amount must be a number greater than 0.")
-        elif int(amount) > int(account[3]):
-            print("Insufficient balance.")
-        else:
-            account[3] = str(int(account[3]) - int(amount))
-            update_account(account)
-            print("Withdrawal successful.")
-            break
-
-def check_balance(account):
-    print(f"Your account balance: ${account[3]}")
-
-def update_account(account):
-    with open("bank_accounts.csv", "r") as file:
-        lines = file.readlines()
-
-    with open("bank_accounts.csv", "w") as file:
-        writer = csv.writer(file)
-        for line in lines:
-            email = list(map(str, line.split(",")))[1]
-            if email == account[1]:
-                writer.writerow(account)
+    @property
+    def name(self):
+        return self._name
+    @name.setter
+    def name(self, val):
+        while True:
+            self._name = input("Enter your name: ")
+            if not is_valid_name(self._name):
+                print("Invalid name format. Please try again.")
             else:
-                writer.writerow(line.strip().split(","))
+                break
+        
+    @property
+    def email(self):
+        return self._email
+    @email.setter
+    def email(self, val):
+        while True:
+            self._email = input("Enter your email: ")
+            if not is_valid_email(self._email):
+                print("Invalid email format. Please try again.")
+            elif self.check_duplicate_email(self._email):
+                print("An account with this email already exists. Please use a different email.")
+            else:
+                break
+        
+    @property
+    def password(self):
+        return self._password
+    @password.setter
+    def password(self, val):
+        while True:
+            self._password = input("Create a password: ")
+            if not is_valid_password(self._password):
+                print("Invalid password format. Please try again.")
+            else:
+                break
+
+    @property
+    def balance(self):
+        return self._balance
+    @balance.setter
+    def balance(self, val):
+        self._balance = val
+
+    def __str__(self):
+        return f"Name: {self._name} | Email: {self._email}"
+    
+    def get_balance(self):
+        print(f"Your account balance: ${self._balance}")
+
+    def check_duplicate_email(self, email):
+        with open("bank_accounts.csv", "r") as file:
+            reader = csv.reader(file)
+            for row in reader:
+                if row[1] == email:
+                    return True
+        return False
+
+class bank():
+    def create_account(self, act):
+        with open("bank_accounts.csv", "a", newline="") as file:
+            writer = csv.writer(file)
+            writer.writerow([act.name, act.email, act.password, act.balance])
+            print("Account successfully created")
+
+    def update_account(self, act):
+        with open("bank_accounts.csv", "r") as file:
+            lines = file.readlines()
+
+        with open("bank_accounts.csv", "w") as file:
+            writer = csv.writer(file)
+            for line in lines:
+                email = list(map(str, line.split(",")))[1]
+                if email == act.email:
+                    writer.writerow([act.name, act.email, act.password, act.balance])
+                else:
+                    writer.writerow(line.strip().split(","))
+    
+    def login(self):
+        email = input("Enter your email: ")
+        password = input("Enter your password: ")
+
+        with open("bank_accounts.csv", "r") as file:
+            reader = csv.reader(file)
+            for row in reader:
+                if row[1] == email and row[2] == password:
+                    act = account(row[0], row[1], row[2], row[3])
+                    return act
+        return None
+    
+    def deposit(self, act):
+        while True:
+            amount = input("Enter the amount to deposit: ")
+            if not is_valid_amount(amount):
+                print("Invalid amount. Amount must be a number greater than 0.")
+            else:
+                act.balance = str(int(act.balance) + int(amount))
+                self.update_account(act)
+                print("Deposit successful.")
+                break
+
+    def withdraw(self, act):
+        while True:
+            amount = input("Enter the amount to withdraw: ")
+            if not is_valid_amount(amount):
+                print("Invalid amount. Amount must be a number greater than 0.")
+            elif int(amount) > int(act.balance):
+                print("Insufficient balance.")
+            else:
+                act.balance = str(int(act.balance) - int(amount))
+                self.update_account(act)
+                print("Withdrawal successful.")
+                break
+
 
 def main():
+    BANK = bank()
     while True:
         print("\n1. Open Account")
         print("2. Login")
@@ -118,11 +151,15 @@ def main():
 
         match choice:
             case "1":
-                create_account()
+                ACCOUNT = account()
+                ACCOUNT.name = ""
+                ACCOUNT.email = ""
+                ACCOUNT.password = ""
+                BANK.create_account(ACCOUNT)
             case "2":
-                account = login()
-                if account:
-                    print(f"Welcome, {account[0]}!")
+                ACCOUNT = BANK.login()
+                if ACCOUNT:
+                    print(f"Welcome, {ACCOUNT.name}!")
                     while True:
                         print("\n1. Deposit")
                         print("2. Withdraw")
@@ -132,11 +169,11 @@ def main():
 
                         match sub_choice:
                             case "1":
-                                deposit(account)
+                                BANK.deposit(ACCOUNT)
                             case "2":
-                                withdraw(account)
+                                BANK.withdraw(ACCOUNT)
                             case "3":
-                                check_balance(account)
+                                ACCOUNT.get_balance()
                             case "4":
                                 print("Logging out.")
                                 break
