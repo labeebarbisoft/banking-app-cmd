@@ -1,4 +1,3 @@
-import csv
 import re
 
 # from menu_constants import (
@@ -158,6 +157,7 @@ class Bank:
     def create_account():
         user = User()
         DataReader.add_new_user(user)
+        print("Account created successfully.")
 
     @staticmethod
     def login():
@@ -181,11 +181,11 @@ class Bank:
     def withdraw(user):
         amount = Controller.get_valid_integer()
         if amount > user.balance:
-            print("Not enough balance")
+            print("Not enough balance.")
         else:
             user.balance -= amount
             Bank.update_account(user.email, user.balance)
-            print("Withdraw successful")
+            print("Withdraw successful.")
 
 
 def main():
