@@ -1,14 +1,5 @@
 import re
-
-# from menu_constants import (
-#     OPEN_ACCOUNT,
-#     LOGIN,
-#     MAIN_EXIT,
-#     DEPOSIT,
-#     WITHDRAW,
-#     CHECK_BALANCE,
-#     SUB_EXIT,
-# )
+import menu_constants
 
 
 class Menus:
@@ -193,9 +184,9 @@ def main():
         Menus.display_main_menu()
         choice = input("Enter your choice: ")
         match choice:
-            case "1":
+            case menu_constants.OPEN_ACCOUNT:
                 Bank.create_account()
-            case "2":
+            case menu_constants.LOGIN:
                 user = Bank.login()
                 if user is not None:
                     print(f"Welcome, {user.name}!")
@@ -203,20 +194,20 @@ def main():
                         Menus.display_sub_menu()
                         sub_choice = input("Enter your choice: ")
                         match sub_choice:
-                            case "a":
+                            case menu_constants.DEPOSIT:
                                 Bank.deposit(user)
-                            case "b":
+                            case menu_constants.WITHDRAW:
                                 Bank.withdraw(user)
-                            case "c":
+                            case menu_constants.CHECK_BALANCE:
                                 print(f"Your balance is : ${user.balance}")
-                            case "d":
+                            case menu_constants.SUB_EXIT:
                                 print("Logging out.")
                                 break
                             case _:
                                 print("Invalid choice. Please try again.")
                 else:
                     print("Login failed. Please check your email and password.")
-            case "3":
+            case menu_constants.MAIN_EXIT:
                 print("Exiting the banking app.")
                 break
             case _:
